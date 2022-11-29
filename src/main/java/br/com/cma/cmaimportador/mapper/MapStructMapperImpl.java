@@ -12,11 +12,15 @@ public class MapStructMapperImpl implements MapStructMapper {
 
 
     @Override
-    public Historics QuotesResponseToHistorics(ArrQuotes arrQuotes) {
+    public Historics ArraQuotesToHistorics(ArrQuotes arrQuotes) {
 
         if (arrQuotes == null) {
             return null;
         }
-        return null;
+        Historics historics = new Historics();
+        historics.setData(new Date());
+        historics.setBase(arrQuotes.getSymbolId().getSymbol());
+
+        return historics;
     }
 }

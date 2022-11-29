@@ -5,5 +5,5 @@ import br.com.cma.cmaimportador.service.response.ArrQuotes;
 
 public interface MapStructMapper {
 
-    Historics QuotesResponseToHistorics(ArrQuotes arrQuotes);
+    Historics ArraQuotesToHistorics(ArrQuotes arrQuotes);
 }

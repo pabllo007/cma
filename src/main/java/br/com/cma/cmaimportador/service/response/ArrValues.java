@@ -37,7 +37,7 @@ public class ArrValues {
     private String doisB;
 
     @JsonProperty("1C")
-    private String umC;
+    private Integer umC;
 
     @JsonProperty("2C")
     private String doisC;

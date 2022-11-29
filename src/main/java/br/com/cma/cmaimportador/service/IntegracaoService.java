@@ -7,6 +7,7 @@ import br.com.cma.cmaimportador.service.request.SymbolSearchRequest;
 import br.com.cma.cmaimportador.service.response.LoginResponse;
 import br.com.cma.cmaimportador.service.response.QuotesResponse;
 import br.com.cma.cmaimportador.service.response.SymbolSearchResponse;
+import br.com.cma.cmaimportador.service.utils.DataUtils;
 import br.com.cma.cmaimportador.service.utils.RequestBoby;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ public class IntegracaoService {
 
    public void executaIntegracao() {
 
+      String timeRef = DataUtils.getHoraMinutoSegundo();
       String sessionId = getSessionId();
 
       List<AssetsEntity> listaAssets = assetsService.getAssetsType("AC");
@@ -42,7 +44,7 @@ public class IntegracaoService {
       log.info("INICIO INTEGRAÇÃO CONTRATOS FUTUROS");
       listaAssets.forEach(x -> {
 
-         contratosFuturosService.executar(sessionId, x.getAsset());
+         contratosFuturosService.executar(sessionId, x, timeRef);
 
       });
 

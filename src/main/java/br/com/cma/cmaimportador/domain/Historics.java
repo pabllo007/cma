@@ -17,9 +17,10 @@ import java.util.List;
 public class Historics {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "date")
+    @Column(name = "DATA_REFE")
     private Date data;
 
     @Column(name = "ticker")
@@ -27,6 +28,9 @@ public class Historics {
 
     @Column(name = "base")
     private String base;
+
+    @Column(name = "asset_type")
+    private String assetType;
 
     @Column(name = "strike")
     private BigDecimal strike;
@@ -44,13 +48,16 @@ public class Historics {
     private BigDecimal priceLast;
 
     @Column(name = "quantity_last")
-    private Long quantityLast;
+    private Integer quantityLast;
 
     @Column(name = "time_last")
-    private Date timeLast;
+    private String timeLast;
 
     @Column(name = "quantity_total")
-    private Long quantityTotal;
+    private Integer quantityTotal;
+
+    @Column(name = "timeRef")
+    private String timeRef;
 
     @OneToMany(mappedBy = "historics")
     private List<BidsEntity> birds;

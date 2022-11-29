@@ -1,6 +1,8 @@
 package br.com.cma.cmaimportador.service;
 
+import br.com.cma.cmaimportador.domain.AssetsEntity;
 import br.com.cma.cmaimportador.domain.BidsEntity;
+import br.com.cma.cmaimportador.domain.Historics;
 import br.com.cma.cmaimportador.mapper.MapStructMapper;
 import br.com.cma.cmaimportador.service.request.QuotesRequest;
 import br.com.cma.cmaimportador.service.response.ArrQuotes;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -26,16 +29,21 @@ public class ContratosFuturosServiceImpl implements ContratosFutrosService {
 
     private MapStructMapper mapStructMapper;
 
+    private HistoricsService historicsService;
+
     @Autowired
-    public ContratosFuturosServiceImpl(WebClient webClient, MapStructMapper mapStructMapper) {
+    public ContratosFuturosServiceImpl(
+            WebClient webClient, MapStructMapper mapStructMapper,
+            HistoricsService historicsService) {
         this.webClient = webClient;
         this.mapStructMapper = mapStructMapper;
+        this.historicsService = historicsService;
     }
 
     @Override
-    public void executar(String sessionID, String asset) {
+    public void executar(String sessionID, AssetsEntity asset, String timeRef) {
 
-        QuotesRequest quotesRequest = RequestBoby.montaContratosFuturosRequest(sessionID, asset);
+        QuotesRequest quotesRequest = RequestBoby.montaContratosFuturosRequest(sessionID, asset.getAsset());
         Mono<QuotesResponse> quotesResponse = webClient
                 .post()
                 .bodyValue(quotesRequest)
@@ -47,42 +55,32 @@ public class ContratosFuturosServiceImpl implements ContratosFutrosService {
 
         QuotesResponse quotes = quotesResponse.block();
 
-        BidsEntity bidsEntity = new BidsEntity();
-
         Optional<ArrQuotes> optArrQuotes = quotes.getArrQuotes().stream().findFirst();
         if (optArrQuotes.isPresent() && optArrQuotes.get().getArrValues() != null) {
-            log.info("CONTRATO: " + optArrQuotes.get().getSymbolId().getSymbol());
+            Historics historics = mapStructMapper.ArraQuotesToHistorics(optArrQuotes.get());
+            historics.setTimeRef(timeRef);
 
-                //Salvar ArrQuotes
-                optArrQuotes.get().getArrValues().stream().forEach(x -> {
-                    if(optArrQuotes.get().getSymbolId().getSymbol().equals("AZUL4")) {
-
-                            if(x.getZeroUm() != null) {
-                                log.info("01: " + x.getZeroUm());
-                            }
-                            if(x.getDez() != null) {
-                                log.info("10: " + x.getDez());
-                            }
-                            if(x.getUmA() != null) {
-                                log.info("1A: " + x.getUmA());
-                            }
-                            if(x.getUmC() != null) {
-                                log.info("1C: " + x.getUmC());
-                            }
-                            if(x.getVinteQuatro() != null) {
-                                log.info("24: " + x.getVinteQuatro());
-                            }
-
-                    }
-                });
+            optArrQuotes.get().getArrValues().stream().forEach(x -> {
+                if(x.getZeroUm() != null) {
+                }
+                if(x.getDez() != null) {
+                    historics.setPriceLast(new BigDecimal(x.getDez()));
+                }
+                if(x.getUmA() != null) {
+                    historics.setPriceLast(new BigDecimal(x.getUmA()));
+                }
+                if(x.getUmC() != null) {
+                    historics.setQuantityLast(x.getUmC());
+                }
+                if(x.getVinteQuatro() != null) {
+                    historics.setTimeLast(x.getVinteQuatro());
+                }
+            });
 
                 //Salvar Sessions
                 optArrQuotes.get().getSessions().forEach(x -> {
-                    log.info("Begin: " + x.getBegin());
-                    log.info("END: " + x.getEnd());
                 });
-                log.info("=======================================================================");
-
+                historicsService.salvar(historics);
         }
 
     }
