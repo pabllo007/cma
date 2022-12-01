@@ -18,8 +18,14 @@ public class ArrValues {
     @JsonProperty("03")
     private String zeroTres;
 
+    @JsonProperty("09")
+    private String expiration;
+
     @JsonProperty("10")
     private String dez;
+
+    @JsonProperty("19")
+    private Integer quantidadeAcumulada;
 
     @JsonProperty("0A")
     private String zeroA;
@@ -65,5 +71,65 @@ public class ArrValues {
 
     @JsonProperty("65")
     private String sessentaCinco;
+
+    @JsonProperty("14")
+    private String bid;
+
+    @JsonProperty("30")
+    private String bidDois;
+
+    @JsonProperty("31")
+    private String bidTres;
+
+    @JsonProperty("32")
+    private String bidQuatro;
+
+    @JsonProperty("33")
+    private String bidCinco;
+
+    @JsonProperty("15")
+    private String ask;
+
+    @JsonProperty("34")
+    private String askDois;
+
+    @JsonProperty("35")
+    private String askTres;
+
+    @JsonProperty("36")
+    private String askQuatro;
+
+    @JsonProperty("37")
+    private String askCinco;
+
+    @JsonProperty("06")
+    private Integer qtdBird;
+
+    @JsonProperty("07")
+    private Integer qtdAsk;
+
+    @JsonProperty("38")
+    private Integer qtdBird2;
+
+    @JsonProperty("39")
+    private Integer qtdBird3;
+
+    @JsonProperty("3A")
+    private Integer qtdBird4;
+
+    @JsonProperty("3B")
+    private Integer qtdBird5;
+
+    @JsonProperty("3C")
+    private Integer qtdAsk2;
+
+    @JsonProperty("3D")
+    private Integer qtdAsk3;
+
+    @JsonProperty("3E")
+    private Integer qtdAsk4;
+
+    @JsonProperty("3F")
+    private Integer qtdAsk5;
 
 }

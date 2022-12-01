@@ -1,8 +1,8 @@
 package br.com.cma.cmaimportador.mapper;
 
-import br.com.cma.cmaimportador.domain.Historics;
+import br.com.cma.cmaimportador.domain.AtivosEntity;
+import br.com.cma.cmaimportador.domain.SerieHistorica;
 import br.com.cma.cmaimportador.service.response.ArrQuotes;
-import br.com.cma.cmaimportador.service.response.QuotesResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -10,17 +10,16 @@ import java.util.Date;
 @Component
 public class MapStructMapperImpl implements MapStructMapper {
 
-
-    @Override
-    public Historics ArraQuotesToHistorics(ArrQuotes arrQuotes) {
-
+     @Override
+    public SerieHistorica ArraQuotesToSerieHistorica(ArrQuotes arrQuotes, AtivosEntity asset) {
         if (arrQuotes == null) {
             return null;
         }
-        Historics historics = new Historics();
-        historics.setData(new Date());
-        historics.setBase(arrQuotes.getSymbolId().getSymbol());
+        SerieHistorica obj = new SerieHistorica();
+        obj.setDataReferencia(new Date());
+        obj.setBase(arrQuotes.getSymbolId().getSymbol());
+        obj.setAtivos(asset);
 
-        return historics;
+        return obj;
     }
 }

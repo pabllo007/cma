@@ -1,11 +1,9 @@
 package br.com.cma.cmaimportador.service;
 
-import br.com.cma.cmaimportador.domain.AssetsEntity;
+import br.com.cma.cmaimportador.domain.AtivosEntity;
 import br.com.cma.cmaimportador.service.request.LoginRequest;
-import br.com.cma.cmaimportador.service.request.QuotesRequest;
 import br.com.cma.cmaimportador.service.request.SymbolSearchRequest;
 import br.com.cma.cmaimportador.service.response.LoginResponse;
-import br.com.cma.cmaimportador.service.response.QuotesResponse;
 import br.com.cma.cmaimportador.service.response.SymbolSearchResponse;
 import br.com.cma.cmaimportador.service.utils.DataUtils;
 import br.com.cma.cmaimportador.service.utils.RequestBoby;
@@ -28,7 +26,7 @@ public class IntegracaoService {
    private final WebClient webClient;
 
    @Autowired
-   private AssetsService assetsService;
+   private AtivosService ativosService;
 
    @Autowired
    private ContratosFutrosService contratosFuturosService;
@@ -39,7 +37,7 @@ public class IntegracaoService {
       String timeRef = DataUtils.getHoraMinutoSegundo();
       String sessionId = getSessionId();
 
-      List<AssetsEntity> listaAssets = assetsService.getAssetsType("AC");
+      List<AtivosEntity> listaAssets = ativosService.getAtivosType("AC");
 
       log.info("INICIO INTEGRAÇÃO CONTRATOS FUTUROS");
       listaAssets.forEach(x -> {
@@ -81,9 +79,7 @@ public class IntegracaoService {
 
    //Ações
    private SymbolSearchResponse getAcoesResponse(String sessionID) {
-      log.info("Sessão Ações ----NAO FUNCIONANDO");
       SymbolSearchRequest symbolSearchRequest = RequestBoby.montaAcoesRequest(sessionID);
-
       Mono<SymbolSearchResponse> symbolResponse = webClient
               .post()
               .bodyValue(symbolSearchRequest)
@@ -91,13 +87,12 @@ public class IntegracaoService {
               .onStatus(HttpStatus::is4xxClientError,
                       error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
               .bodyToMono(SymbolSearchResponse.class);
-
       SymbolSearchResponse symbolSearchResponse = symbolResponse.block();
       return symbolSearchResponse;
    }
 
 
-   //Ações
+   //Opçoes
    private SymbolSearchResponse getOpcoesResponse(String sessionID) {
       log.info("Sessão Opçoes ");
       SymbolSearchRequest symbolSearchRequest = RequestBoby.montaOpcoesRequest(sessionID);

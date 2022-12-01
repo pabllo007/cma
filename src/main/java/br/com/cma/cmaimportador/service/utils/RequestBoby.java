@@ -60,10 +60,10 @@ public class RequestBoby {
                 .timeoutHandler(120)
                 .failActionType("closeconnection")
                 .source(12)
-                .max(1000)
+                .max(100)
                 .symbol("ABEV")
                 .description("")
-                .market("0")
+                .market("O")
                 .page(0)
                 .match(false)
                 .build();
