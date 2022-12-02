@@ -47,6 +47,29 @@ public class RequestBoby {
                 .user("STRFEEDCONSTANCIA01")
                 .build();
     }
+    public static SymbolSearchRequest montaAcoesRequest(String sessionId, String asset, Integer pagina) {
+
+        asset = asset.substring(0,4);
+
+        return SymbolSearchRequest
+                .builder()
+                .id(1)
+                .name("SymbolSearchRequest")
+                .sessionId(sessionId)
+                .type("q")
+                .sync(true)
+                .timeoutHandler(120)
+                .failActionType("closeconnection")
+                .source(12)
+                .max(1000)
+                .symbol(asset.trim())
+                .description("")
+                .market("O")
+                .page(pagina)
+                .match(false)
+                .build();
+
+    }
 
 
     public static SymbolSearchRequest montaAcoesRequest(String sessionId) {
@@ -108,6 +131,20 @@ public class RequestBoby {
         quotesRequest.setSign(false);
 
         return quotesRequest;
+    }
+
+    public static LogoutRequest montaBodyLogout(String sessionId) {
+        return LogoutRequest
+                .builder()
+                .id(1)
+                .name("LogoutAdvRequest")
+                .sessionId(sessionId)
+                .type("s")
+                .sync(true)
+                .version(1)
+                .advUser("STRFEEDCONSTANCIA01")
+                .reason("texto")
+                .build();
     }
 
 }

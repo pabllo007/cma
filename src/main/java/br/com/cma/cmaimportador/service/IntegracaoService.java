@@ -2,6 +2,7 @@ package br.com.cma.cmaimportador.service;
 
 import br.com.cma.cmaimportador.domain.AtivosEntity;
 import br.com.cma.cmaimportador.service.request.LoginRequest;
+import br.com.cma.cmaimportador.service.request.LogoutRequest;
 import br.com.cma.cmaimportador.service.request.SymbolSearchRequest;
 import br.com.cma.cmaimportador.service.response.LoginResponse;
 import br.com.cma.cmaimportador.service.response.SymbolSearchResponse;
@@ -31,6 +32,9 @@ public class IntegracaoService {
    @Autowired
    private ContratosFutrosService contratosFuturosService;
 
+   @Autowired
+   private AcoesService acoesService;
+
 
    public void executaIntegracao() {
 
@@ -42,14 +46,16 @@ public class IntegracaoService {
       log.info("INICIO INTEGRAÇÃO CONTRATOS FUTUROS");
       listaAssets.forEach(x -> {
 
-         contratosFuturosService.executar(sessionId, x, timeRef);
+         //contratosFuturosService.executar(sessionId, x, timeRef);
+
+         acoesService.executar(sessionId, x, timeRef);
 
       });
-
+      logout(sessionId);
       log.info("FIM INTEGRAÇÃO CONTRATOS FUTUROS");
 
-//      log.info("Monta request Ações");
-//      SymbolSearchResponse acoes = getAcoesResponse(sessionId);
+     // log.info("Monta request Ações");
+     // SymbolSearchResponse acoes = getAcoesResponse(sessionId);
 //
 //      log.info("Monta request opções");
 //      SymbolSearchResponse opcoes = getOpcoesResponse(sessionId);
@@ -77,9 +83,41 @@ public class IntegracaoService {
       return loginResponse.getSessionId();
    }
 
+   private void logout(String sessionId){
+      log.info("Realiza logout");
+      LogoutRequest reqLogin = RequestBoby.montaBodyLogout(sessionId);
+
+      Mono<String> logoutResponseMono = webClient
+              .post()
+              .bodyValue(reqLogin)
+              .accept(APPLICATION_JSON)
+              .retrieve()
+              .onStatus(HttpStatus::is4xxClientError,
+                      error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
+              .bodyToMono(String.class);
+
+      String loginResponse = logoutResponseMono.block();
+      log.info(loginResponse);
+
+   }
+
    //Ações
+
    private SymbolSearchResponse getAcoesResponse(String sessionID) {
       SymbolSearchRequest symbolSearchRequest = RequestBoby.montaAcoesRequest(sessionID);
+      Mono<SymbolSearchResponse> symbolResponse = webClient
+              .post()
+              .bodyValue(symbolSearchRequest)
+              .retrieve()
+              .onStatus(HttpStatus::is4xxClientError,
+                      error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
+              .bodyToMono(SymbolSearchResponse.class);
+      SymbolSearchResponse symbolSearchResponse = symbolResponse.block();
+      return symbolSearchResponse;
+   }
+
+   private SymbolSearchResponse getAcoesResponse(String sessionID, String asset, Integer pagina) {
+      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaAcoesRequest(sessionID, asset, pagina);
       Mono<SymbolSearchResponse> symbolResponse = webClient
               .post()
               .bodyValue(symbolSearchRequest)
