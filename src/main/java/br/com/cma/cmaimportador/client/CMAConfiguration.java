@@ -20,6 +20,9 @@ public class CMAConfiguration {
                         HttpClient.create()
                                 .resolver(DefaultAddressResolverGroup.INSTANCE)))
                 .baseUrl("https://strfeedrt06.cma.com.br/execute")
+                .codecs(configurer -> configurer
+                        .defaultCodecs()
+                        .maxInMemorySize(16 * 1024 * 1024))
                 .defaultHeader("Accept", MediaType.APPLICATION_JSON_VALUE,
                         "Content-Type", MediaType.APPLICATION_JSON_VALUE,
                         "Accept", "*/*",
