@@ -177,16 +177,16 @@ public class ContratosFuturosServiceImpl implements ContratosFutrosService {
 
             serieHistoricaService.salvar(obj);
 
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird).quantity(this.qtdBird).type("BI").serieHistoricas(obj).build());
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird2).quantity(this.qtdBird2).type("BI").serieHistoricas(obj).build());
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird3).quantity(this.qtdBird3).type("BI").serieHistoricas(obj).build());
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird4).quantity(this.qtdBird4).type("BI").serieHistoricas(obj).build());
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird5).quantity(this.qtdBird5).type("BI").serieHistoricas(obj).build());
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask).quantity(this.qtdAsk).type("AS").serieHistoricas(obj).build());
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask2).quantity(this.qtdAsk2).type("AS").serieHistoricas(obj).build());
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask3).quantity(this.qtdAsk3).type("AS").serieHistoricas(obj).build());
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask4).quantity(this.qtdAsk4).type("AS").serieHistoricas(obj).build());
-            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask5).quantity(this.qtdAsk5).type("AS").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird).quantity(this.qtdBird).type("BID").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird2).quantity(this.qtdBird2).type("BID").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird3).quantity(this.qtdBird3).type("BID").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird4).quantity(this.qtdBird4).type("BID").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird5).quantity(this.qtdBird5).type("BID").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask).quantity(this.qtdAsk).type("ASK").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask2).quantity(this.qtdAsk2).type("ASK").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask3).quantity(this.qtdAsk3).type("ASK").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask4).quantity(this.qtdAsk4).type("ASK").serieHistoricas(obj).build());
+            bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask5).quantity(this.qtdAsk5).type("ASK").serieHistoricas(obj).build());
             bidsAsksService.salvarEmLote(bidsAsksEntityList);
         }
 
