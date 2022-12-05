@@ -21,7 +21,7 @@ public class AtivosEntity {
     @Column(name = "TYPE")
     private String type;
 
-    @OneToMany(mappedBy = "ativo")
-    private List<SubAtivosEntity> subAtivos;
+//    @OneToMany(mappedBy = "ativo")
+//    private List<SubAtivosEntity> subAtivos;
 
 }

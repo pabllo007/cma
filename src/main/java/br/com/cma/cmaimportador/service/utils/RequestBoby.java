@@ -47,7 +47,7 @@ public class RequestBoby {
                 .user("STRFEEDCONSTANCIA01")
                 .build();
     }
-    public static SymbolSearchRequest montaAcoesRequest(String sessionId, String asset, Integer pagina) {
+    public static SymbolSearchRequest montaOpcoesRequest(String sessionId, String asset, Integer pagina) {
 
         asset = asset.substring(0,4);
 
@@ -72,7 +72,7 @@ public class RequestBoby {
     }
 
 
-    public static SymbolSearchRequest montaAcoesRequest(String sessionId) {
+    public static SymbolSearchRequest montaOpcoesRequest(String sessionId) {
         return SymbolSearchRequest
                 .builder()
                 .id(1)
@@ -93,7 +93,14 @@ public class RequestBoby {
 
     }
 
-    public static SymbolSearchRequest montaOpcoesRequest(String sessionId) {
+
+    /**
+     * Monta request Contratos Futuros
+     * @param sessionId
+     * @return
+     */
+
+    public static SymbolSearchRequest montaFuturosRequest(String sessionId) {
         return SymbolSearchRequest
                 .builder()
                 .id(1)
@@ -114,7 +121,13 @@ public class RequestBoby {
 
     }
 
-    public static QuotesRequest montaContratosFuturosRequest(String sessionId, String asset) {
+    /**
+     * Monta request Ações
+     * @param sessionId
+     * @param asset
+     * @return
+     */
+    public static QuotesRequest montaAcoesRequest(String sessionId, String asset) {
         QuotesRequest quotesRequest = new QuotesRequest();
         quotesRequest.setId(1);
         quotesRequest.setName("QuotesRequest");

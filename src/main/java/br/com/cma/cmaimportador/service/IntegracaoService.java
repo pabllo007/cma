@@ -30,29 +30,35 @@ public class IntegracaoService {
    private AtivosService ativosService;
 
    @Autowired
-   private ContratosFutrosService contratosFuturosService;
-
-   @Autowired
    private AcoesService acoesService;
 
+   @Autowired
+   private OpcoesService opcoesService;
+
+   @Autowired
+   private LoginService loginService;
 
    public void executaIntegracao() {
 
       String timeRef = DataUtils.getHoraMinutoSegundo();
-      String sessionId = getSessionId();
+      String sessionId = loginService.executarLogin();
+
+      if (sessionId == null || sessionId == "") {
+         return;
+      }
 
       List<AtivosEntity> listaAssets = ativosService.getAtivosType("AC");
 
-      log.info("INICIO INTEGRAÇÃO CONTRATOS FUTUROS");
+      log.info("INICIO INTEGRAÇÃO AÇÕES");
       listaAssets.forEach(x -> {
-
-         //contratosFuturosService.executar(sessionId, x, timeRef);
 
          acoesService.executar(sessionId, x, timeRef);
 
+         //opcoesService.executar(sessionId, x, timeRef);
+
       });
-      logout(sessionId);
-      log.info("FIM INTEGRAÇÃO CONTRATOS FUTUROS");
+      loginService.executarLogout(sessionId);
+      log.info("FIM INTEGRAÇÃO AÇÕES");
 
      // log.info("Monta request Ações");
      // SymbolSearchResponse acoes = getAcoesResponse(sessionId);
@@ -65,10 +71,10 @@ public class IntegracaoService {
 
    //Login
    private String getSessionId(){
-      log.info("Monta request do login");
+      log.info("MONTA REQUEST LOGIN");
       LoginRequest reqLogin = RequestBoby.montaBodyLogin();
 
-      log.info("Realiza requisição do login");
+      log.info("REALIZA REQUISIÇÃO LOGIN");
       Mono<LoginResponse> loginResponseMono = webClient
               .post()
               .bodyValue(reqLogin)
@@ -84,7 +90,7 @@ public class IntegracaoService {
    }
 
    private void logout(String sessionId){
-      log.info("Realiza logout");
+      log.info("REALIZA REQUISIÇÃO LOGOUT");
       LogoutRequest reqLogin = RequestBoby.montaBodyLogout(sessionId);
 
       Mono<String> logoutResponseMono = webClient
@@ -97,14 +103,12 @@ public class IntegracaoService {
               .bodyToMono(String.class);
 
       String loginResponse = logoutResponseMono.block();
-      log.info(loginResponse);
-
    }
 
    //Ações
 
    private SymbolSearchResponse getAcoesResponse(String sessionID) {
-      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaAcoesRequest(sessionID);
+      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaOpcoesRequest(sessionID);
       Mono<SymbolSearchResponse> symbolResponse = webClient
               .post()
               .bodyValue(symbolSearchRequest)
@@ -117,7 +121,7 @@ public class IntegracaoService {
    }
 
    private SymbolSearchResponse getAcoesResponse(String sessionID, String asset, Integer pagina) {
-      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaAcoesRequest(sessionID, asset, pagina);
+      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaOpcoesRequest(sessionID, asset, pagina);
       Mono<SymbolSearchResponse> symbolResponse = webClient
               .post()
               .bodyValue(symbolSearchRequest)
@@ -133,7 +137,7 @@ public class IntegracaoService {
    //Opçoes
    private SymbolSearchResponse getOpcoesResponse(String sessionID) {
       log.info("Sessão Opçoes ");
-      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaOpcoesRequest(sessionID);
+      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaFuturosRequest(sessionID);
 
       Mono<SymbolSearchResponse> symbolResponse = webClient
               .post()
