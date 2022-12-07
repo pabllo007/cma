@@ -40,25 +40,32 @@ public class IntegracaoService {
 
    public void executaIntegracao() {
 
-      String timeRef = DataUtils.getHoraMinutoSegundo();
       String sessionId = loginService.executarLogin();
 
-      if (sessionId == null || sessionId == "") {
-         return;
+      try {
+         String timeRef = DataUtils.getHoraMinutoSegundo();
+
+         if (sessionId == null || sessionId == "") {
+            return;
+         }
+
+         List<AtivosEntity> listaAssets = ativosService.getAtivosType("AC");
+
+         log.info("INICIO INTEGRAÇÃO AÇÕES");
+         listaAssets.forEach(x -> {
+
+            acoesService.executar(sessionId, x, timeRef);
+
+            //opcoesService.executar(sessionId, x, timeRef);
+
+         });
+         loginService.executarLogout(sessionId);
+         log.info("FIM INTEGRAÇÃO AÇÕES");
+
+      } catch (Exception e) {
+         loginService.executarLogout(sessionId);
+         log.info("ERRO INTEGRAÇÃO AÇÕES");
       }
-
-      List<AtivosEntity> listaAssets = ativosService.getAtivosType("AC");
-
-      log.info("INICIO INTEGRAÇÃO AÇÕES");
-      listaAssets.forEach(x -> {
-
-         acoesService.executar(sessionId, x, timeRef);
-
-         //opcoesService.executar(sessionId, x, timeRef);
-
-      });
-      loginService.executarLogout(sessionId);
-      log.info("FIM INTEGRAÇÃO AÇÕES");
 
      // log.info("Monta request Ações");
      // SymbolSearchResponse acoes = getAcoesResponse(sessionId);

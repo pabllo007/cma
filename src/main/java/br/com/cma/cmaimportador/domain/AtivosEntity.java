@@ -18,7 +18,7 @@ public class AtivosEntity {
     @Column(name = "ASSET")
     private String asset;
 
-    @Column(name = "TYPE")
+    @Column(name = "TYPE_ASSET")
     private String type;
 
 //    @OneToMany(mappedBy = "ativo")

@@ -3,8 +3,9 @@ package br.com.cma.cmaimportador.service;
 
 import br.com.cma.cmaimportador.service.request.LoginRequest;
 import br.com.cma.cmaimportador.service.request.LogoutRequest;
-import br.com.cma.cmaimportador.service.response.LoginResponse;
 import br.com.cma.cmaimportador.service.utils.RequestBoby;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,18 +28,20 @@ public class LoginImplService implements LoginService {
         LoginRequest reqLogin = RequestBoby.montaBodyLogin();
 
         log.info("REALIZA REQUISIÇÃO LOGIN");
-        Mono<LoginResponse> loginResponseMono = webClient
+        Mono<String> loginResponseMono = webClient
                 .post()
                 .bodyValue(reqLogin)
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError,
                         error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
-                .bodyToMono(LoginResponse.class);
+                .bodyToMono(String.class);
 
-        LoginResponse loginResponse = loginResponseMono.block();
+        String loginResponse = loginResponseMono.block();
+        JsonObject jsonObject = new JsonParser().parse(loginResponse).getAsJsonObject();
+        String sessionId =  jsonObject.get("sessionId").getAsString();
         log.info("FINALIZA REQUISIÇÃO LOGIN");
-        return loginResponse.getSessionId();
+        return sessionId;
     }
 
     @Override

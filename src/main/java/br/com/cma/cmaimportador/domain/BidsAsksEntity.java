@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -26,8 +28,11 @@ public class BidsAsksEntity {
     @Column(name = "QUANTITY")
     private Integer quantity;
 
-    @Column(name = "TYPE")
+    @Column(name = "TYPE_BIDS_ASKS")
     private String type;
+
+    @Column(name = "DATA_REFERENCIA")
+    private Date dataReferencia;
 
     @ManyToOne
     @JoinColumn(name = "ID_HITORICS")

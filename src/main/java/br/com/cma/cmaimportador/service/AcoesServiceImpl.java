@@ -19,6 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,6 +75,8 @@ public class AcoesServiceImpl implements AcoesService {
     @Override
     public void executar(String sessionID, AtivosEntity asset, String timeRef) {
 
+        Date dataReferencia = new Date();
+
         QuotesRequest quotesRequest = RequestBoby.montaAcoesRequest(sessionID, asset.getAsset());
         QuotesResponse quotes = requestService.getQuotesRequest(quotesRequest);;
 
@@ -96,23 +99,23 @@ public class AcoesServiceImpl implements AcoesService {
             log.info("SALVANDO SERIE HISTORICA");
             log.info(obj.toString());
             serieHistoricaService.salvar(obj);
-            montaBirsAsksEntityList(obj, bidsAsksEntityList);
+            montaBirsAsksEntityList(obj, bidsAsksEntityList, dataReferencia);
             log.info("SALVANDO BIDS e ASKS");
             log.info(bidsAsksEntityList.toString());
             bidsAsksService.salvarEmLote(bidsAsksEntityList);
         }
     }
-    private void montaBirsAsksEntityList(SerieHistorica obj, List<BidsAsksEntity> bidsAsksEntityList) {
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird).quantity(this.qtdBird).type("BID").serieHistoricas(obj).build());
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird2).quantity(this.qtdBird2).type("BID").serieHistoricas(obj).build());
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird3).quantity(this.qtdBird3).type("BID").serieHistoricas(obj).build());
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird4).quantity(this.qtdBird4).type("BID").serieHistoricas(obj).build());
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird5).quantity(this.qtdBird5).type("BID").serieHistoricas(obj).build());
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask).quantity(this.qtdAsk).type("ASK").serieHistoricas(obj).build());
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask2).quantity(this.qtdAsk2).type("ASK").serieHistoricas(obj).build());
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask3).quantity(this.qtdAsk3).type("ASK").serieHistoricas(obj).build());
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask4).quantity(this.qtdAsk4).type("ASK").serieHistoricas(obj).build());
-        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask5).quantity(this.qtdAsk5).type("ASK").serieHistoricas(obj).build());
+    private void montaBirsAsksEntityList(SerieHistorica obj, List<BidsAsksEntity> bidsAsksEntityList , Date dataReferencia) {
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird).quantity(this.qtdBird).type("BID").dataReferencia(dataReferencia).serieHistoricas(obj).build());
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird2).quantity(this.qtdBird2).type("BID").dataReferencia(dataReferencia).serieHistoricas(obj).build());
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird3).quantity(this.qtdBird3).type("BID").dataReferencia(dataReferencia).serieHistoricas(obj).build());
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird4).quantity(this.qtdBird4).type("BID").dataReferencia(dataReferencia).serieHistoricas(obj).build());
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.bird5).quantity(this.qtdBird5).type("BID").dataReferencia(dataReferencia).serieHistoricas(obj).build());
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask).quantity(this.qtdAsk).type("ASK").dataReferencia(dataReferencia).serieHistoricas(obj).build());
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask2).quantity(this.qtdAsk2).type("ASK").dataReferencia(dataReferencia).serieHistoricas(obj).build());
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask3).quantity(this.qtdAsk3).type("ASK").dataReferencia(dataReferencia).serieHistoricas(obj).build());
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask4).quantity(this.qtdAsk4).type("ASK").dataReferencia(dataReferencia).serieHistoricas(obj).build());
+        bidsAsksEntityList.add(BidsAsksEntity.builder().price(this.ask5).quantity(this.qtdAsk5).type("ASK").dataReferencia(dataReferencia).serieHistoricas(obj).build());
     }
 
     private static void setValuesSerieHistorica(SerieHistorica obj, ArrValues x) {

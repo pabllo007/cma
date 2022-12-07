@@ -20,5 +20,4 @@ public class LoginResponse {
     private String uid;
     private Boolean success;
     private Integer status;
-    private String textual;
 }
