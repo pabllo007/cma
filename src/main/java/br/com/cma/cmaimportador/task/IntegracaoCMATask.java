@@ -13,8 +13,9 @@ public class IntegracaoCMATask {
     @Autowired
     private IntegracaoService integracaoService;
 
-    private static final String TIME_ZONE = "America/Sao_Paulo";
-    @Scheduled(fixedDelayString = "${cma.tasks.fixed-delay}")
+    public static final String TIME_ZONE = "America/Sao_Paulo";
+    public static final String EXP_SEGUNDA_SEXTA_10H_AS_18H = "* * 10-18 * * MON-FRI";
+    @Scheduled(cron = EXP_SEGUNDA_SEXTA_10H_AS_18H, zone=TIME_ZONE)
     public void execute() {
         integracaoService.executaIntegracao();
     }
