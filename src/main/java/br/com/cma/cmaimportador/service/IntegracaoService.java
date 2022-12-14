@@ -1,47 +1,38 @@
 package br.com.cma.cmaimportador.service;
 
 import br.com.cma.cmaimportador.domain.AtivosEntity;
-import br.com.cma.cmaimportador.service.request.LoginRequest;
-import br.com.cma.cmaimportador.service.request.LogoutRequest;
-import br.com.cma.cmaimportador.service.request.SymbolSearchRequest;
-import br.com.cma.cmaimportador.service.response.LoginResponse;
-import br.com.cma.cmaimportador.service.response.SymbolSearchResponse;
+import br.com.cma.cmaimportador.domain.SerieHistorica;
+import br.com.cma.cmaimportador.mapper.MapStructMapper;
 import br.com.cma.cmaimportador.service.utils.DataUtils;
-import br.com.cma.cmaimportador.service.utils.RequestBoby;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class IntegracaoService {
-   private final WebClient webClient;
 
+   private final WebClient webClient;
    @Autowired
    private AtivosService ativosService;
-
    @Autowired
    private AcoesService acoesService;
-
    @Autowired
    private OpcoesService opcoesService;
-
+   @Autowired
+   private FuturosService futurosService;
    @Autowired
    private LoginService loginService;
-
-   public void executaIntegracao() {
-
-      String sessionId = loginService.executarLogin();
-
+   @Autowired
+   private MapStructMapper mapStructMapper;
+   public void executaIntegracao(String sessionId) {
       try {
          String timeRef = DataUtils.getHoraMinutoSegundo();
 
@@ -49,128 +40,37 @@ public class IntegracaoService {
             return;
          }
 
-         List<AtivosEntity> listaAssets = ativosService.getAtivosType("AC");
+         List<AtivosEntity> listaAssets = ativosService.getAssets();
+         List<AtivosEntity> listaAssetsAcoeOpceos = listaAssets.stream().filter( x -> x.getType().trim().equals("AC")).collect(Collectors.toList());
 
-         log.info("INICIO INTEGRAÇÃO AÇÕES");
-         listaAssets.forEach(x -> {
-
-            acoesService.executar(sessionId, x, timeRef);
-
-            //opcoesService.executar(sessionId, x, timeRef);
+         log.info("INICIO INTEGRAÇÃO ACOES: " + LocalDateTime.now());
+         listaAssetsAcoeOpceos.forEach(x -> {
+            SerieHistorica baseSerieHistorica = mapStructMapper.baseSerieHistorica(new SerieHistorica(), x, timeRef);
+            acoesService.executar(sessionId, x, baseSerieHistorica, "12");
 
          });
-         loginService.executarLogout(sessionId);
-         log.info("FIM INTEGRAÇÃO AÇÕES");
+         log.info("FIM INTEGRAÇÃO ACOES: " +  LocalDateTime.now());
+
+         log.info("INICIO INTEGRAÇÃO OPÇÕES: " + LocalDateTime.now());
+         listaAssetsAcoeOpceos.forEach(x -> {
+            SerieHistorica baseSerieHistorica = mapStructMapper.baseSerieHistorica(new SerieHistorica(), x, timeRef);
+            opcoesService.executar(sessionId, x, baseSerieHistorica);
+         });
+         log.info("FIM INTEGRAÇÃO OPÇÕES: " + LocalDateTime.now());
+
+
+         List<AtivosEntity> listaAssetsFuturos = listaAssets.stream().filter( x -> x.getType().trim().equals("CF")).collect(Collectors.toList());
+         log.info("INICIO INTEGRAÇÃO CONTRATOS FUTUROS: " + LocalDateTime.now());
+         listaAssetsFuturos.forEach(x -> {
+            SerieHistorica baseSerieHistorica = mapStructMapper.baseSerieHistorica(new SerieHistorica(), x, timeRef);
+            futurosService.executar(sessionId, x, baseSerieHistorica);
+         });
+         log.info("FIM INTEGRAÇÃO CONTRATOS FUTUROS: " + LocalDateTime.now());
 
       } catch (Exception e) {
          loginService.executarLogout(sessionId);
-         log.info("ERRO INTEGRAÇÃO AÇÕES");
+         log.error(e.getMessage());
+         log.info("ERRO INTEGRAÇÃO");
       }
-
-     // log.info("Monta request Ações");
-     // SymbolSearchResponse acoes = getAcoesResponse(sessionId);
-//
-//      log.info("Monta request opções");
-//      SymbolSearchResponse opcoes = getOpcoesResponse(sessionId);
-//
-
    }
-
-   //Login
-   private String getSessionId(){
-      log.info("MONTA REQUEST LOGIN");
-      LoginRequest reqLogin = RequestBoby.montaBodyLogin();
-
-      log.info("REALIZA REQUISIÇÃO LOGIN");
-      Mono<LoginResponse> loginResponseMono = webClient
-              .post()
-              .bodyValue(reqLogin)
-              .accept(APPLICATION_JSON)
-              .retrieve()
-              .onStatus(HttpStatus::is4xxClientError,
-                      error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
-              .bodyToMono(LoginResponse.class);
-
-      LoginResponse loginResponse = loginResponseMono.block();
-
-      return loginResponse.getSessionId();
-   }
-
-   private void logout(String sessionId){
-      log.info("REALIZA REQUISIÇÃO LOGOUT");
-      LogoutRequest reqLogin = RequestBoby.montaBodyLogout(sessionId);
-
-      Mono<String> logoutResponseMono = webClient
-              .post()
-              .bodyValue(reqLogin)
-              .accept(APPLICATION_JSON)
-              .retrieve()
-              .onStatus(HttpStatus::is4xxClientError,
-                      error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
-              .bodyToMono(String.class);
-
-      String loginResponse = logoutResponseMono.block();
-   }
-
-   //Ações
-
-   private SymbolSearchResponse getAcoesResponse(String sessionID) {
-      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaOpcoesRequest(sessionID);
-      Mono<SymbolSearchResponse> symbolResponse = webClient
-              .post()
-              .bodyValue(symbolSearchRequest)
-              .retrieve()
-              .onStatus(HttpStatus::is4xxClientError,
-                      error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
-              .bodyToMono(SymbolSearchResponse.class);
-      SymbolSearchResponse symbolSearchResponse = symbolResponse.block();
-      return symbolSearchResponse;
-   }
-
-   private SymbolSearchResponse getAcoesResponse(String sessionID, String asset, Integer pagina) {
-      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaOpcoesRequest(sessionID, asset, pagina);
-      Mono<SymbolSearchResponse> symbolResponse = webClient
-              .post()
-              .bodyValue(symbolSearchRequest)
-              .retrieve()
-              .onStatus(HttpStatus::is4xxClientError,
-                      error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
-              .bodyToMono(SymbolSearchResponse.class);
-      SymbolSearchResponse symbolSearchResponse = symbolResponse.block();
-      return symbolSearchResponse;
-   }
-
-
-   //Opçoes
-   private SymbolSearchResponse getOpcoesResponse(String sessionID) {
-      log.info("Sessão Opçoes ");
-      SymbolSearchRequest symbolSearchRequest = RequestBoby.montaFuturosRequest(sessionID);
-
-      Mono<SymbolSearchResponse> symbolResponse = webClient
-              .post()
-              .bodyValue(symbolSearchRequest)
-              .retrieve()
-              .onStatus(HttpStatus::is4xxClientError,
-                      error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
-              .bodyToMono(SymbolSearchResponse.class);
-
-      SymbolSearchResponse symbolSearchResponse = symbolResponse.block();
-      return symbolSearchResponse;
-   }
-   //Contratos Futuros
-//   private QuotesResponse getContratosFuturosResponse(String sessionID, String asset) {
-//      QuotesRequest quotesRequest = RequestBoby.montaContratosFuturosRequest(sessionID, asset);
-//      Mono<QuotesResponse> quotesResponse = webClient
-//              .post()
-//              .bodyValue(quotesRequest)
-//              .accept(APPLICATION_JSON)
-//              .retrieve()
-//              .onStatus(HttpStatus::is4xxClientError,
-//                      error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
-//              .bodyToMono(QuotesResponse.class);
-//
-//      QuotesResponse quotes = quotesResponse.block();
-//
-//      return quotes;
-//   }
 }

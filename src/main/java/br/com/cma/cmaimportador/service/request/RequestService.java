@@ -1,6 +1,8 @@
 package br.com.cma.cmaimportador.service.request;
 
 import br.com.cma.cmaimportador.service.response.QuotesResponse;
+import br.com.cma.cmaimportador.service.response.SymbolSearchResponse;
+import br.com.cma.cmaimportador.service.utils.RequestBoby;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,5 +30,32 @@ public class RequestService {
 
         QuotesResponse quotes = quotesResponse.block();
         return quotes;
+    }
+
+    public SymbolSearchResponse getSymbolSearchResponse(String sessionID, String asset, Integer pagina) {
+        SymbolSearchRequest symbolSearchRequest = RequestBoby.montaOpcoesRequest(sessionID, asset, pagina);
+        Mono<SymbolSearchResponse> symbolResponse = webClient
+                .post()
+                .bodyValue(symbolSearchRequest)
+                .retrieve()
+                .onStatus(HttpStatus::is4xxClientError,
+                        error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
+                .bodyToMono(SymbolSearchResponse.class);
+        SymbolSearchResponse symbolSearchResponse = symbolResponse.block();
+        return symbolSearchResponse;
+    }
+
+
+    public SymbolSearchResponse getSymbolSearchFututosResponse(String sessionID, String asset, Integer pagina) {
+        SymbolSearchRequest symbolSearchRequest = RequestBoby.montaOpcoesFuturosRequest(sessionID, asset, pagina);
+        Mono<SymbolSearchResponse> symbolResponse = webClient
+                .post()
+                .bodyValue(symbolSearchRequest)
+                .retrieve()
+                .onStatus(HttpStatus::is4xxClientError,
+                        error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
+                .bodyToMono(SymbolSearchResponse.class);
+        SymbolSearchResponse symbolSearchResponse = symbolResponse.block();
+        return symbolSearchResponse;
     }
 }

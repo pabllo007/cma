@@ -25,7 +25,7 @@ public class ArrValues {
     private String dez;
 
     @JsonProperty("19")
-    private Integer quantidadeAcumulada;
+    private String quantidadeAcumulada;
 
     @JsonProperty("0A")
     private String zeroA;
@@ -43,7 +43,7 @@ public class ArrValues {
     private String doisB;
 
     @JsonProperty("1C")
-    private Integer umC;
+    private String umC;
 
     @JsonProperty("2C")
     private String doisC;
@@ -103,33 +103,33 @@ public class ArrValues {
     private String askCinco;
 
     @JsonProperty("06")
-    private Integer qtdBird;
+    private String qtdBird;
 
     @JsonProperty("07")
-    private Integer qtdAsk;
+    private String qtdAsk;
 
     @JsonProperty("38")
-    private Integer qtdBird2;
+    private String qtdBird2;
 
     @JsonProperty("39")
-    private Integer qtdBird3;
+    private String qtdBird3;
 
     @JsonProperty("3A")
-    private Integer qtdBird4;
+    private String qtdBird4;
 
     @JsonProperty("3B")
-    private Integer qtdBird5;
+    private String qtdBird5;
 
     @JsonProperty("3C")
-    private Integer qtdAsk2;
+    private String qtdAsk2;
 
     @JsonProperty("3D")
-    private Integer qtdAsk3;
+    private String qtdAsk3;
 
     @JsonProperty("3E")
-    private Integer qtdAsk4;
+    private String qtdAsk4;
 
     @JsonProperty("3F")
-    private Integer qtdAsk5;
+    private String qtdAsk5;
 
 }

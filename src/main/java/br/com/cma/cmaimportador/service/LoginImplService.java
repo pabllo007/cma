@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,6 +23,7 @@ public class LoginImplService implements LoginService {
 
     private final WebClient webClient;
 
+//    @Cacheable("login")
     @Override
     public String executarLogin() {
         log.info("MONTA REQUEST LOGIN");

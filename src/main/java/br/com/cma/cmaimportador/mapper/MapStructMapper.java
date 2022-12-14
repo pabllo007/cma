@@ -6,5 +6,8 @@ import br.com.cma.cmaimportador.service.response.ArrQuotes;
 
 public interface MapStructMapper {
 
+    SerieHistorica baseSerieHistorica(SerieHistorica obj, AtivosEntity asset, String timeRef);
     SerieHistorica ArraQuotesToSerieHistorica(ArrQuotes arrQuotes, AtivosEntity asset);
+
+
 }

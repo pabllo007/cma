@@ -3,7 +3,9 @@ package br.com.cma.cmaimportador.service;
 import br.com.cma.cmaimportador.domain.AtivosEntity;
 import br.com.cma.cmaimportador.domain.SerieHistorica;
 import br.com.cma.cmaimportador.mapper.MapStructMapper;
+import br.com.cma.cmaimportador.service.request.RequestService;
 import br.com.cma.cmaimportador.service.request.SymbolSearchRequest;
+import br.com.cma.cmaimportador.service.response.QuotesResponse;
 import br.com.cma.cmaimportador.service.response.SymbolSearchResponse;
 import br.com.cma.cmaimportador.service.utils.RequestBoby;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,12 @@ public class OpcoesServiceImpl implements OpcoesService {
     private MapStructMapper mapStructMapper;
 
     private SerieHistoricaService serieHistoricaService;
+
+    @Autowired
+    private AcoesService acoesService;
+
+    @Autowired
+    private RequestService requestService;
 
     @Autowired
     private BidsAsksService bidsAsksService;
@@ -65,14 +73,12 @@ public class OpcoesServiceImpl implements OpcoesService {
     }
 
     @Override
-    public void executar(String sessionID, AtivosEntity asset, String timeRef) {
+    public void executar(String sessionID, AtivosEntity asset, SerieHistorica serieHistorica) {
         Integer pagina = 0;
-        Integer total = 0;
-        SymbolSearchResponse obj = getSymbolSearchResponse(sessionID, asset.getAsset(), pagina);
-        total = obj.getTotal();
-        SerieHistorica serieHistorica = new SerieHistorica();
-        serieHistorica.setDataReferencia(new Date());
-        serieHistorica.setHoraReferencia(timeRef);
+        SymbolSearchResponse obj = requestService.getSymbolSearchResponse(sessionID, asset.getAsset(), pagina);;
+        if(serieHistorica == null) {
+            new SerieHistorica();
+        }
         obj.getSymbols().forEach(x -> {
             serieHistorica.setTicker(x.getSymbol());
             serieHistorica.setBase(x.getRoot());
@@ -80,6 +86,10 @@ public class OpcoesServiceImpl implements OpcoesService {
             serieHistorica.setStrike(new BigDecimal(x.getExercisePrice()));
             serieHistorica.setExpiration(x.getExerciseDate());
             serieHistorica.setMarket(x.getMarket());
+
+            /// CHAMAR A SERVICE QUOTES
+            acoesService.executar(sessionID, asset, serieHistorica, "12");
+
         });
     }
 
@@ -92,25 +102,5 @@ public class OpcoesServiceImpl implements OpcoesService {
             return "Put";
         };
         return "";
-    }
-
-    private SymbolSearchResponse getSymbolSearchResponse(String sessionID, String asset, Integer pagina) {
-        SymbolSearchRequest symbolSearchRequest = RequestBoby.montaOpcoesRequest(sessionID, asset, pagina);
-        Mono<SymbolSearchResponse> symbolResponse = webClient
-                .post()
-                .bodyValue(symbolSearchRequest)
-                .retrieve()
-                .onStatus(HttpStatus::is4xxClientError,
-                        error -> Mono.error(new RuntimeException("verifique os parâmetros informados")))
-                .bodyToMono(SymbolSearchResponse.class);
-        SymbolSearchResponse symbolSearchResponse = symbolResponse.block();
-        return symbolSearchResponse;
-    }
-
-
-
-    @Override
-    public void salvar() {
-
     }
 }

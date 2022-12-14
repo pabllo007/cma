@@ -70,7 +70,29 @@ public class RequestBoby {
                 .build();
 
     }
+    public static SymbolSearchRequest montaOpcoesFuturosRequest(String sessionId, String asset, Integer pagina) {
 
+        asset = asset.substring(0,4);
+
+        return SymbolSearchRequest
+                .builder()
+                .id(1)
+                .name("SymbolSearchRequest")
+                .sessionId(sessionId)
+                .type("q")
+                .sync(true)
+                .timeoutHandler(120)
+                .failActionType("closeconnection")
+                .source(57)
+                .max(1000)
+                .symbol(asset.trim())
+                .description("")
+                .market("")
+                .page(pagina)
+                .match(false)
+                .build();
+
+    }
 
     public static SymbolSearchRequest montaOpcoesRequest(String sessionId) {
         return SymbolSearchRequest
@@ -127,7 +149,7 @@ public class RequestBoby {
      * @param asset
      * @return
      */
-    public static QuotesRequest montaAcoesRequest(String sessionId, String asset) {
+    public static QuotesRequest montaAcoesRequest(String sessionId, String asset, String sourceId) {
         QuotesRequest quotesRequest = new QuotesRequest();
         quotesRequest.setId(1);
         quotesRequest.setName("QuotesRequest");
@@ -139,7 +161,7 @@ public class RequestBoby {
         quotesRequest.setFields("");
         quotesRequest.setRealtime(true);
         List<Symbols> symbols = new ArrayList<>();
-        symbols.add(Symbols.builder().sourceId("12").symbol(asset.trim()).build());
+        symbols.add(Symbols.builder().sourceId(sourceId).symbol(asset.trim()).build());
         quotesRequest.setSymbols(symbols);
         quotesRequest.setSign(false);
 

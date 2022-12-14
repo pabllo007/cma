@@ -1,5 +1,8 @@
 package br.com.cma.cmaimportador.service;
 
-public interface AcoesService extends ProcessamentoService {
+import br.com.cma.cmaimportador.domain.AtivosEntity;
+import br.com.cma.cmaimportador.domain.SerieHistorica;
 
+public interface AcoesService {
+    void executar(String sessionID, AtivosEntity asset, SerieHistorica serieHistorica, String sourceId);
 }
