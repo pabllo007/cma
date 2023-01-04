@@ -88,6 +88,7 @@ public class OpcoesServiceImpl implements OpcoesService {
             serieHistorica.setMarket(x.getMarket());
 
             /// CHAMAR A SERVICE QUOTES
+            asset.setAsset(x.getSymbol());
             acoesService.executar(sessionID, asset, serieHistorica, "12");
 
         });

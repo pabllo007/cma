@@ -55,10 +55,11 @@ public class FuturosServiceImpl implements FuturosService {
             symbolSearchResponse.getSymbols().forEach(x -> {
                 if (x.getSymbol().equals(asset.getAsset())) {
                     obj.setMarket(x.getMarket());
+                    asset.setAsset(x.getSymbol());
+                    processamentoService.processarEhSalvarDados(asset, dataReferencia, quotes, obj);
                 }
             });
         }
 
-        processamentoService.processarEhSalvarDados(asset, dataReferencia, quotes, obj);
     }
 }

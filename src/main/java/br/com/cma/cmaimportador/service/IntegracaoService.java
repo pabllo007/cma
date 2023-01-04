@@ -47,17 +47,17 @@ public class IntegracaoService {
          listaAssetsAcoeOpceos.forEach(x -> {
             SerieHistorica baseSerieHistorica = mapStructMapper.baseSerieHistorica(new SerieHistorica(), x, timeRef);
             acoesService.executar(sessionId, x, baseSerieHistorica, "12");
-
          });
          log.info("FIM INTEGRAÇÃO ACOES: " +  LocalDateTime.now());
 
          log.info("INICIO INTEGRAÇÃO OPÇÕES: " + LocalDateTime.now());
          listaAssetsAcoeOpceos.forEach(x -> {
-            SerieHistorica baseSerieHistorica = mapStructMapper.baseSerieHistorica(new SerieHistorica(), x, timeRef);
-            opcoesService.executar(sessionId, x, baseSerieHistorica);
+//            if(x.getAsset().equals("PETR4") || x.getAsset().equals("ABEV3")) {
+               SerieHistorica baseSerieHistorica = mapStructMapper.baseSerieHistorica(new SerieHistorica(), x, timeRef);
+               opcoesService.executar(sessionId, x, baseSerieHistorica);
+//            }
          });
          log.info("FIM INTEGRAÇÃO OPÇÕES: " + LocalDateTime.now());
-
 
          List<AtivosEntity> listaAssetsFuturos = listaAssets.stream().filter( x -> x.getType().trim().equals("CF")).collect(Collectors.toList());
          log.info("INICIO INTEGRAÇÃO CONTRATOS FUTUROS: " + LocalDateTime.now());
